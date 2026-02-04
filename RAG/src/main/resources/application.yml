@@ -30,3 +30,11 @@ mybatis-plus:
 # jwt配置
 jwt:
   secret-key: "PXrQbuCwXwOZzkML/Vm2S5rSwt1iybvmKtGDzVEu+Hc="
+
+
+# 管理员账号初始化配置
+admin:
+  username: admin
+  password: admin123
+  primary-org: default
+  org-tags: default,admin

@@ -38,10 +38,10 @@ public class UserController {
     private JwtUtils jwtUtils;
 
     // 用户请求记录类
-    public record UserRequest(String username, String password) {}
+    private record UserRequest(String username, String password) {}
 
     // 主组织标签请求记录类
-    public record PrimaryOrgRequest(String primaryOrg) {}
+    private record PrimaryOrgRequest(String primaryOrg) {}
 
     // 用户注册接口
     // 接收用户请求体中的用户名和密码，并调用用户服务进行注册
