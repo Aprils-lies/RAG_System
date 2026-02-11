@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.april.rag.mapper.FileUploadMapper">
+
+    <!-- 根据 MD5 查询 -->
+    <select id="selectByFileMd5" resultType="com.april.rag.entity.FileUpload">
+        SELECT *
+        FROM file_upload
+        WHERE file_md5 = #{fileMd5}
+    </select>
+
+    <!-- 根据 MD5 + 用户 -->
+    <select id="selectByFileMd5AndUserId" resultType="com.april.rag.entity.FileUpload">
+        SELECT *
+        FROM file_upload
+        WHERE file_md5 = #{fileMd5}
+          AND user_id = #{userId}
+    </select>
+
+    <!-- 查询公开文件（按文件名） -->
+    <select id="selectPublicByFileName" resultType="com.april.rag.entity.FileUpload">
+        SELECT *
+        FROM file_upload
+        WHERE file_name = #{fileName}
+          AND is_public = true
+        LIMIT 1
+    </select>
+
+    <!-- 统计 MD5 数量 -->
+    <select id="countByFileMd5" resultType="java.lang.Long">
+        SELECT COUNT(1)
+        FROM file_upload
+        WHERE file_md5 = #{fileMd5}
+    </select>
+
+    <!-- 删除 MD5 -->
+    <delete id="deleteByFileMd5">
+        DELETE FROM file_upload
+        WHERE file_md5 = #{fileMd5}
+    </delete>
+
+    <!-- 删除 MD5 + 用户 -->
+    <delete id="deleteByFileMd5AndUserId">
+        DELETE FROM file_upload
+        WHERE file_md5 = #{fileMd5}
+          AND user_id = #{userId}
+    </delete>
+
+    <!-- 查询用户自己的文件 -->
+    <select id="selectByUserId" resultType="com.april.rag.entity.FileUpload">
+        SELECT *
+        FROM file_upload
+        WHERE user_id = #{userId}
+    </select>
+
+    <!-- 根据 MD5 列表查询 -->
+    <select id="selectByFileMd5In" resultType="com.april.rag.entity.FileUpload">
+        SELECT *
+        FROM file_upload
+        WHERE file_md5 IN
+        <foreach collection="md5List"
+                 item="md5"
+                 open="("
+                 separator=","
+                 close=")">
+            #{md5}
+        </foreach>
+    </select>
+
+    <!-- 查询用户自己的文件和公开文件 -->
+    <select id="findByUserIdOrIsPublicTrue"
+            parameterType="java.lang.String"
+            resultType="com.april.rag.entity.FileUpload">
+        SELECT *
+        FROM file_upload
+        WHERE user_id = #{userId}
+           OR is_public = true
+    </select>
+
+    <!-- 查询用户可访问的所有文件（含组织标签权限） -->
+    <select id="findAccessibleFilesWithTags"
+            resultType="com.april.rag.entity.FileUpload">
+        SELECT *
+        FROM file_upload
+        WHERE
+        user_id = #{userId}
+        OR is_public = true
+        OR (
+        is_public = false
+        AND org_tag IN
+        <foreach collection="orgTagList"
+                 item="tag"
+                 open="("
+                 separator=","
+                 close=")">
+            #{tag}
+        </foreach>
+        )
+    </select>
+
+    <!-- 原始方法（逻辑保持一致，方便以后改） -->
+    <select id="findAccessibleFiles"
+            resultType="com.april.rag.entity.FileUpload">
+        SELECT *
+        FROM file_upload
+        WHERE
+        user_id = #{userId}
+        OR is_public = true
+        OR (
+        is_public = false
+        AND org_tag IN
+        <foreach collection="orgTagList"
+                 item="tag"
+                 open="("
+                 separator=","
+                 close=")">
+            #{tag}
+        </foreach>
+        )
+    </select>
+
+</mapper>

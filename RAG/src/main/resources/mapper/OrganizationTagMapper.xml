@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.april.rag.mapper.OrganizationTagMapper">
+
+    <!-- 根据 tagId 查询 -->
+    <select id="findByTagId"
+            parameterType="java.lang.String"
+            resultType="com.april.rag.entity.OrganizationTag">
+        SELECT *
+        FROM organization_tags
+        WHERE tag_id = #{tagId}
+    </select>
+
+    <!-- 根据 parentTag 查询子标签 -->
+    <select id="findByParentTag"
+            parameterType="java.lang.String"
+            resultType="com.april.rag.entity.OrganizationTag">
+        SELECT *
+        FROM organization_tags
+        WHERE parent_tag = #{parentTag}
+    </select>
+
+    <!-- 判断 tagId 是否存在 -->
+    <select id="existsByTagId"
+            parameterType="java.lang.String"
+            resultType="boolean">
+        SELECT COUNT(*) > 0
+        FROM organization_tags
+        WHERE tag_id = #{tagId}
+    </select>
+
+</mapper>

@@ -10,12 +10,17 @@
         <result column="role" property="role"/>
         <result column="org_tags" property="orgTags"/>
         <result column="created_at" property="createdAt"/>
-        <result column="updated_at" property="updateAt"/>
+        <result column="updated_at" property="updatedAt"/>
     </resultMap>
 
     <!-- 自定义查询方法 -->
     <select id="findByUsername" resultMap="BaseResultMap">
         SELECT * FROM users WHERE username = #{username}
+    </select>
+
+    <!-- 自定义查询方法 -->
+    <select id="findById" resultMap="BaseResultMap">
+        SELECT * FROM users WHERE id = #{userId}
     </select>
 
 </mapper>

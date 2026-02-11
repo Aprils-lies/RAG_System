@@ -15,9 +15,7 @@ import org.apache.ibatis.annotations.Select;
 @Mapper
 public interface UserMapper extends BaseMapper<User> {
 
-//    @Select("select * from users where username = #{username}")
     User findByUsername(String username);
 
-    @Select("select * from users where id = #{userId}")
     User findById(Long userId);
 }

@@ -16,12 +16,9 @@ import java.util.List;
 @Mapper
 public interface OrganizationTagMapper extends BaseMapper<OrganizationTag> {
 
-    @Select("select * from organization_tags where tag_id = #{tagId}")
     OrganizationTag findByTagId(String tagId);
 
-    @Select("select * from organization_tags where parent_tag = #{parentTag}")
     List<OrganizationTag> findByParentTag(String parentTag);
 
-    @Select("select count(*) > 0 from organization_tags where tag_id = #{tagId}")
     boolean existsByTagId(String tagId);
 }
