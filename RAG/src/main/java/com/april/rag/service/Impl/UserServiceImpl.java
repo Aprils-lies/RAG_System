@@ -109,7 +109,7 @@ public class UserServiceImpl implements UserService {
             privateTag.setTagId(privateTagId);
             privateTag.setName(username + PRIVATE_ORG_NAME_SUFFIX);
             privateTag.setDescription(PRIVATE_ORG_DESCRIPTION);
-            privateTag.setCreatedBy(owner);
+            privateTag.setCreatedBy(owner.getId());
 
             organizationTagMapper.insert(privateTag);
             logger.info("Private organization tag created successfully for user: {}", username);
@@ -133,7 +133,7 @@ public class UserServiceImpl implements UserService {
             defaultTag.setTagId(DEFAULT_ORG_TAG);
             defaultTag.setName(DEFAULT_ORG_NAME);
             defaultTag.setDescription(DEFAULT_ORG_DESCRIPTION);
-            defaultTag.setCreatedBy(adminUser);
+            defaultTag.setCreatedBy(adminUser.getId());
 
             organizationTagMapper.insert(defaultTag);
             logger.info("Default organization tag created successfully");
@@ -274,7 +274,7 @@ public class UserServiceImpl implements UserService {
         tag.setName(name);
         tag.setDescription(description);
         tag.setParentTag(parentTag);
-        tag.setCreatedBy(creator);
+        tag.setCreatedBy(creator.getId());
         organizationTagMapper.insert(tag);
         OrganizationTag savedTag = tag;
 

@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -37,6 +38,7 @@ import java.util.stream.Collectors;
  *    - 由本过滤器负责从JWT令牌中提取用户ID并设置为请求属性
  */
 
+@Component
 public class OrgTagAuthorizationFilter extends OncePerRequestFilter {
     private static final Logger logger = LoggerFactory.getLogger(OrgTagAuthorizationFilter.class);
     private static final String DEFAULT_ORG_TAG = "DEFAULT"; // 默认组织标签

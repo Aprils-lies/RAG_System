@@ -69,7 +69,7 @@ public class OrgTagInitializer implements CommandLineRunner {
             tag.setTagId(tagId);
             tag.setName(name);
             tag.setDescription(description);
-            tag.setCreatedBy(creator);
+            tag.setCreatedBy(creator.getId());
             organizationTagMapper.insert(tag);
             logger.info("组织标签 '{}' 创建成功", tagId);
         } else {

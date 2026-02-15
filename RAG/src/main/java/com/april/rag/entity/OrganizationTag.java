@@ -53,7 +53,7 @@ public class OrganizationTag {
      */
     @TableField("created_by")
     @NotNull
-    private User createdBy;
+    private Long createdBy;
 
     /**
      * 创建时间（自动填充）

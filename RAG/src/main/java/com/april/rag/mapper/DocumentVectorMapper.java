@@ -1,6 +1,7 @@
 package com.april.rag.mapper;
 
 import com.april.rag.entity.DocumentVector;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -12,7 +13,7 @@ import java.util.List;
  */
 
 @Mapper
-public interface DocumentVectorMapper {
+public interface DocumentVectorMapper extends BaseMapper<DocumentVector> {
     /**
      * 根据文件 MD5 查询该文件的所有向量分块
      */

@@ -27,6 +27,14 @@ mybatis-plus:
   mapper-locations: classpath:mapper/*.xml               # XML 映射文件路径
   type-aliases-package: com.april.rag.entity             # 实体扫描路径
 
+# minIO配置
+minio:
+  endpoint: http://localhost:9000
+  accessKey: minioadmin
+  secretKey: minioadmin
+  bucketName: uploads
+  publicUrl: http://localhost:9000
+
 # jwt配置
 jwt:
   secret-key: "PXrQbuCwXwOZzkML/Vm2S5rSwt1iybvmKtGDzVEu+Hc="
@@ -38,9 +46,23 @@ admin:
   primary-org: default
   org-tags: default,admin
 
+file:
+  parsing:
+    chunk-size: 512 # 每个文本块的最大字符数
+    buffer-size: 8192    # 8KB 缓冲区
+    max-memory-threshold: 0.8  # 80% 内存阈值
+
 elasticsearch:
   host: localhost       # Elasticsearch主机地址
   port: 9200            # Elasticsearch端口号
-  scheme: https         # 协议（http/https）
-  username: elastic     # 安装后生成的默认用户
-  password: zVLf2sb05Pnuk8toM+ws
+  scheme: http         # 协议（http/https）
+#  username: elastic     # 安装后生成的默认用户
+#  password: zVLf2sb05Pnuk8toM+ws
+
+embedding:
+  api:
+    url: https://dashscope.aliyuncs.com/compatible-mode/v1
+    key:    # 填入通义千问API key
+    model: text-embedding-v4
+    batch-size: 10  # 单次请求最大行数（DashScope限制为10）
+    dimension: 2048  # 指定向量维度
