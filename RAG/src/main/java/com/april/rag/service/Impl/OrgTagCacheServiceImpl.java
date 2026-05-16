@@ -161,11 +161,11 @@ public class OrgTagCacheServiceImpl implements OrgTagCacheService {
             // 如果用户有标签，添加到集合中并查找父标签
             if (userTags != null && !userTags.isEmpty()) {
                 allEffectiveTags.addAll(userTags);
-            }
 
-            // 查找所有父标签
-            for (String tagId : userTags) {
-                collectParentTags(tagId, allEffectiveTags);
+                // 查找所有父标签
+                for (String tagId : userTags) {
+                    collectParentTags(tagId, allEffectiveTags);
+                }
             }
 
             // 确保默认标签在结果中

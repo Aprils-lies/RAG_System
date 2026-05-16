@@ -60,7 +60,7 @@ public class UserServiceImpl implements UserService {
     public void registerUser(String username, String password) {
         // 1：检查数据库中是否已存在该用户
         User user = userMapper.findByUsername(username);
-        if (user == null) {
+        if (user != null) {
             // 若用户名已存在，抛出自定义异常，状态码为 400 Bad Request
             throw new CustomException("Username already exists", HttpStatus.BAD_REQUEST);
         }
@@ -76,7 +76,7 @@ public class UserServiceImpl implements UserService {
 
         // 3：创建用户的私人组织标签 并保存数据库以及redis
         String privateTagId = PRIVATE_TAG_PREFIX + username;
-        createPrivateOrgTag(privateTagId, username, user);
+        createPrivateOrgTag(privateTagId, username, newUser);
 
         // 只分配私人组织标签
         newUser.setOrgTags(privateTagId);

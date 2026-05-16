@@ -19,7 +19,7 @@ import java.util.Map;
  */
 
 @RestController
-@RequestMapping("/api/v1/search")
+@RequestMapping("/api/search")
 public class SearchController {
 
     @Autowired

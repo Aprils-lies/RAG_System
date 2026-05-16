@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.april.rag.mapper.ConversationMapper">
+    <select id="selectByUserIdAndTime" resultType="com.april.rag.entity.Conversation">
+        SELECT * FROM conversations
+        WHERE user_id = #{userId}
+        <if test="startDate != null and endDate != null">
+            AND timestamp BETWEEN #{startDate} AND #{endDate}
+        </if>
+        ORDER BY timestamp DESC
+    </select>
+
+    <select id="selectByUserId" resultType="com.april.rag.entity.Conversation">
+        SELECT * FROM conversations
+        WHERE user_id = #{userId}
+        ORDER BY timestamp DESC
+    </select>
+
+    <select id="selectByTime" resultType="com.april.rag.entity.Conversation">
+        SELECT * FROM conversations
+        WHERE timestamp BETWEEN #{startDate} AND #{endDate}
+        ORDER BY timestamp DESC
+    </select>
+</mapper>
