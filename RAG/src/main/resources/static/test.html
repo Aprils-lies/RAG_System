@@ -1181,41 +1181,40 @@
         async function performSearch() {
             const query = document.getElementById('search-query').value.trim();
             const topK = parseInt(document.getElementById('search-topk').value) || 10;
-            
+
             if (!query) {
                 showResponse('search-response', '请输入搜索关键词', false);
                 return;
             }
-            
+
             try {
                 showResponse('search-response', '正在检索中...', true);
-                
-                // 构建GET请求URL
+
                 const params = new URLSearchParams();
                 params.append('query', query);
                 params.append('topK', topK);
-                
                 const url = `/api/search/hybrid?${params.toString()}`;
-                
+
                 const headers = {};
                 if (token) {
                     headers['Authorization'] = `Bearer ${token}`;
                 }
-                
+
                 const response = await fetch(url, {
                     method: 'GET',
                     headers: headers
                 });
-                
+
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
-                
-                const results = await response.json();
-                
+
+                const result = await response.json();
+                const results = result.data || [];
+
                 showResponse('search-response', `检索完成，找到 ${results.length} 条结果`, true);
                 displaySearchResults(results);
-                
+
             } catch (error) {
                 showResponse('search-response', `检索失败: ${error.message}`, false);
                 document.getElementById('search-results-list').innerHTML = '';
@@ -1223,43 +1222,64 @@
         }
 
         // 显示搜索结果
+        // 显示搜索结果（增强版）
         function displaySearchResults(results) {
             const container = document.getElementById('search-results-list');
             container.innerHTML = '';
-            
-            if (!results || results.length === 0) {
+
+            // 防御性检查
+            if (!results || !Array.isArray(results) || results.length === 0) {
                 container.innerHTML = '<p>没有找到相关结果</p>';
                 return;
             }
-            
+
             results.forEach((result, index) => {
                 const resultDiv = document.createElement('div');
                 resultDiv.className = 'search-result-item';
-                
-                const score = result.score ? result.score.toFixed(3) : 'N/A';
-                const content = result.textContent || result.text_content || '无内容';
+
+                // 安全获取字段值，支持多种字段名
+                const score = result.score !== undefined ? result.score :
+                    (result.relevanceScore !== undefined ? result.relevanceScore : 0);
+                const content = result.textContent || result.content || result.text || '无内容';
                 const fileMd5 = result.fileMd5 || result.file_md5 || '未知';
-                const chunkId = result.chunkId || result.chunk_id || '未知';
+                const chunkId = result.chunkId || result.chunk_id || result.id || '未知';
                 const userId = result.userId || result.user_id || '未知';
-                const orgTag = result.orgTag || result.org_tag || '未知';
-                const isPublic = result.isPublic !== undefined ? result.isPublic : 
-                                (result.is_public !== undefined ? result.is_public : false);
-                
+                const orgTag = result.orgTag || result.org_tag || result.orgTagName || '未知';
+                const isPublic = result.isPublic !== undefined ? result.isPublic :
+                    (result.is_public !== undefined ? result.is_public : false);
+
+                // 处理内容中的特殊字符和换行
+                let displayContent = content;
+                if (typeof displayContent === 'string') {
+                    displayContent = escapeHtml(displayContent.substring(0, 500)); // 限制长度
+                    if (content.length > 500) displayContent += '...';
+                } else {
+                    displayContent = JSON.stringify(displayContent);
+                }
+
                 resultDiv.innerHTML = `
-                    <div class="score">${score}</div>
-                    <h4>结果 ${index + 1}</h4>
-                    <div class="content">${content}</div>
-                    <div class="metadata">
-                        <span><strong>文件MD5:</strong> ${fileMd5}</span>
-                        <span><strong>分片ID:</strong> ${chunkId}</span>
-                        <span><strong>用户ID:</strong> ${userId}</span>
-                        <span><strong>组织标签:</strong> ${orgTag}</span>
-                        <span><strong>可见性:</strong> ${isPublic ? '公开' : '私有'}</span>
-                    </div>
-                `;
-                
+            <div class="score">相似度: ${typeof score === 'number' ? score.toFixed(3) : score}</div>
+            <h4>结果 ${index + 1}</h4>
+            <div class="content">${displayContent}</div>
+            <div class="metadata">
+                <span><strong>文件MD5:</strong> ${escapeHtml(fileMd5)}</span>
+                <span><strong>分片ID:</strong> ${escapeHtml(chunkId)}</span>
+                <span><strong>用户ID:</strong> ${escapeHtml(userId)}</span>
+                <span><strong>组织标签:</strong> ${escapeHtml(orgTag)}</span>
+                <span><strong>可见性:</strong> ${isPublic ? '🔓 公开' : '🔒 私有'}</span>
+            </div>
+        `;
+
                 container.appendChild(resultDiv);
             });
+        }
+
+        // 辅助函数：转义HTML特殊字符
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
         }
 
         // 显示响应信息

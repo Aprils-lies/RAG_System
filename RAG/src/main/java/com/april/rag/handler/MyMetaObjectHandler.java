@@ -17,12 +17,12 @@ import java.time.LocalDateTime;
 public class MyMetaObjectHandler implements MetaObjectHandler {
     @Override
     public void insertFill(MetaObject metaObject) {
-        if (metaObject.hasGetter("createTime")) {
-            strictInsertFill(metaObject, "createTime", LocalDateTime.class, LocalDateTime.now());
+        if (metaObject.hasGetter("createdAt")) {
+            strictInsertFill(metaObject, "createdAt", LocalDateTime.class, LocalDateTime.now());
         }
 
-        if (metaObject.hasGetter("updateTime")) {
-            strictInsertFill(metaObject, "updateTime", LocalDateTime.class, LocalDateTime.now());
+        if (metaObject.hasGetter("updateAt")) {
+            strictInsertFill(metaObject, "updateAt", LocalDateTime.class, LocalDateTime.now());
         }
 
         if (metaObject.hasGetter("mergedAt")) {
@@ -37,8 +37,8 @@ public class MyMetaObjectHandler implements MetaObjectHandler {
 
     @Override
     public void updateFill(MetaObject metaObject) {
-        if (metaObject.hasGetter("updateTime")) {
-            strictUpdateFill(metaObject, "updateTime", LocalDateTime.class, LocalDateTime.now());
+        if (metaObject.hasGetter("updateAt")) {
+            strictUpdateFill(metaObject, "updateAt", LocalDateTime.class, LocalDateTime.now());
         }
 
         if (metaObject.hasGetter("mergedAt")) {
