@@ -12,6 +12,11 @@ spring:
     redis:
       host: localhost
       port: 6379
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+
   kafka:
     enabled: true  # 启用 Kafka
     bootstrap-servers: 127.0.0.1:9092 # Kafka 服务器地址
@@ -85,13 +90,13 @@ elasticsearch:
 deepseek:
   api:
     url: https://api.deepseek.com/v1  # 本地是 http://localhost:11434/v1 官方：https://api.deepseek.com/v1
-    model:
-    key:
+    model: deepseek-chat  # 本地: deepseek-r1:7b, 官方: deepseek-chat
+    key:    # DeepSeek API Key 如果是本地就为空
 
 embedding:
   api:
     url: https://dashscope.aliyuncs.com/compatible-mode/v1
-    key:
+    key: 
     model: text-embedding-v4
     batch-size: 10  # 单次请求最大行数（DashScope限制为10）
     dimension: 2048  # 指定向量维度

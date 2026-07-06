@@ -93,7 +93,7 @@ public class LoggingInterceptor implements HandlerInterceptor {
         try {
             String token = request.getHeader("Authorization");
             if (token != null && token.startsWith("Bearer ")) {
-                token.substring(7);
+                token = token.substring(7);
                 return jwtUtils.extractUserIdFromToken(token);
             }
         } catch (Exception e) {

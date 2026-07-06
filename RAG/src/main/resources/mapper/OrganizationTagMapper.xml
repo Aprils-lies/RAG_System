@@ -17,7 +17,16 @@
             resultType="com.april.rag.entity.OrganizationTag">
         SELECT *
         FROM organization_tags
-        WHERE parent_tag = #{parentTag}
+        <where>
+            <choose>
+                <when test="parentTag != null">
+                    parent_tag = #{parentTag}
+                </when>
+                <otherwise>
+                    parent_tag IS NULL
+                </otherwise>
+            </choose>
+        </where>
     </select>
 
     <!-- 判断 tagId 是否存在 -->

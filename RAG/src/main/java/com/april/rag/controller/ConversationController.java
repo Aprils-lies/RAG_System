@@ -29,7 +29,7 @@ import java.util.Map;
  */
 
 @RestController
-@RequestMapping("/api/v1/users/conversations")
+@RequestMapping("/api/v1/users/conversation")
 public class ConversationController {
 
     @Autowired

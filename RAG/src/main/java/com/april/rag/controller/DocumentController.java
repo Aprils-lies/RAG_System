@@ -212,8 +212,7 @@ public class DocumentController {
             if (token != null && !token.trim().isEmpty()) {
                 try {
                     // 解析JWT token获取用户信息
-                    // 注意：JWT中的sub字段存储用户名，userId字段存储用户ID（但有时可能存储的是用户名）
-                    userId = jwtUtils.extractUsernameFromToken(token);
+                    userId = jwtUtils.extractUserIdFromToken(token);
                     orgTags = jwtUtils.extractOrgTagsFromToken(token);
                 } catch (Exception e) {
                     LogUtils.logBusiness("DOWNLOAD_FILE_BY_NAME", "anonymous", "Token解析失败: fileName=%s", fileName);
@@ -333,27 +332,10 @@ public class DocumentController {
             String userId = null;
             String orgTags = null;
 
-            // 优先从Spring Security上下文获取已认证的用户信息
-            try {
-                var authentication = SecurityContextHolder.getContext().getAuthentication();
-                if (authentication != null && authentication.isAuthenticated()
-                        && authentication.getPrincipal() instanceof UserDetails) {
-                    UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-                    userId = userDetails.getUsername();
-                    // 从userDetails中获取组织标签信息
-                    orgTags = userDetails.getAuthorities().stream()
-                            .map(auth -> auth.getAuthority().replace("ROLE_", ""))
-                            .findFirst()
-                            .orElse(null);
-                }
-            } catch (Exception e) {
-                LogUtils.logBusiness("PREVIEW_FILE_BY_NAME", "anonymous", "Security上下文获取失败: fileName=%s", fileName);
-            }
-
             // 如果Security上下文中没有用户信息，尝试从URL参数token中获取
-            if (userId == null && token != null && !token.trim().isEmpty()) {
+            if (token != null && !token.trim().isEmpty()) {
                 try {
-                    userId = jwtUtils.extractUsernameFromToken(token);
+                    userId = jwtUtils.extractUserIdFromToken(token);
                     orgTags = jwtUtils.extractOrgTagsFromToken(token);
                 } catch (Exception e) {
                     LogUtils.logBusiness("PREVIEW_FILE_BY_NAME", "anonymous", "Token解析失败: fileName=%s", fileName);

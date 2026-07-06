@@ -19,6 +19,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.apache.tika.exception.TikaException;
+import org.apache.tika.metadata.Metadata;
+import org.apache.tika.parser.AutoDetectParser;
+import org.apache.tika.parser.ParseContext;
+import org.apache.tika.sax.BodyContentHandler;
+import org.xml.sax.SAXException;
+
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -234,10 +241,11 @@ public class DocumentServiceImpl implements DocumentService {
 
             // 判断文件类型
             String fileExtension = getFileExtension(fileName).toLowerCase();
-            boolean isTextFile = isTextFile(fileExtension);
+            boolean isPlainText = isPlainTextFile(fileExtension);
+            boolean isBinaryDocument = isBinaryDocumentFile(fileExtension);
 
-            if (isTextFile) {
-                // 对于文本文件，读取前10KB内容
+            if (isPlainText) {
+                // 对于纯文本文件，读取前10KB内容
                 try (InputStream inputStream = minioClient.getObject(
                         GetObjectArgs.builder()
                                 .bucket("uploads")
@@ -262,6 +270,37 @@ public class DocumentServiceImpl implements DocumentService {
 
                     logger.info("成功获取文本文件预览内容: fileMd5={}, contentLength={}", fileMd5, result.length());
                     return result;
+                }
+            } else if (isBinaryDocument) {
+                // 对于二进制文档（docx/doc/pdf），使用Tika解析提取文本
+                try (InputStream inputStream = minioClient.getObject(
+                        GetObjectArgs.builder()
+                                .bucket("uploads")
+                                .object(objectName)
+                                .build())) {
+
+                    BodyContentHandler handler = new BodyContentHandler(-1);
+                    Metadata metadata = new Metadata();
+                    ParseContext context = new ParseContext();
+                    AutoDetectParser parser = new AutoDetectParser();
+
+                    parser.parse(inputStream, handler, metadata, context);
+                    String text = handler.toString();
+
+                    // 限制预览长度
+                    int maxPreviewLength = 10240;
+                    if (text.length() > maxPreviewLength) {
+                        text = text.substring(0, maxPreviewLength) + "\n... (内容已截断，仅显示前10KB)";
+                    }
+
+                    logger.info("成功使用Tika解析文档预览: fileMd5={}, contentLength={}", fileMd5, text.length());
+                    return text;
+                } catch (SAXException | TikaException e) {
+                    logger.error("Tika解析文档失败: fileMd5={}", fileMd5, e);
+                    return String.format(
+                            "文件名: %s\n文件类型: %s\n\n文档解析失败，请下载后查看。",
+                            fileName, fileExtension.toUpperCase()
+                    );
                 }
             } else {
                 // 对于非文本文件，返回文件信息
@@ -304,16 +343,28 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     /**
-     * 判断是否为文本文件
+     * 判断是否为纯文本文件（可直接按UTF-8读取）
      */
-    private boolean isTextFile(String extension) {
+    private boolean isPlainTextFile(String extension) {
         String[] textExtensions = {
-                "txt", "md", "doc", "docx", "pdf", "html", "htm", "xml", "json",
+                "txt", "md", "html", "htm", "xml", "json",
                 "csv", "log", "java", "js", "ts", "py", "cpp", "c", "h", "css",
                 "scss", "less", "sql", "yml", "yaml", "properties", "conf", "config"
         };
 
         return Arrays.stream(textExtensions)
+                .anyMatch(ext -> ext.equalsIgnoreCase(extension));
+    }
+
+    /**
+     * 判断是否为二进制文档文件（需要使用Tika解析）
+     */
+    private boolean isBinaryDocumentFile(String extension) {
+        String[] binaryExtensions = {
+                "docx", "doc", "pdf"
+        };
+
+        return Arrays.stream(binaryExtensions)
                 .anyMatch(ext -> ext.equalsIgnoreCase(extension));
     }
 
